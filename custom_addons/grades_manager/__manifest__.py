@@ -1,0 +1,21 @@
+{
+    'name': 'Grades Management',
+    'summary': 'Handles grades for students and courses',
+    'description': 'Handles grades for students and courses',
+    'author': 'Jose Alvarez',
+    'category': 'Base',
+    'version': '19.0.1.0.1',
+    'depends': ['base'], 
+    'data': [
+        'security/ir.model.access.csv',
+        'views/grades_course_views.xml',
+        'views/rest_partner_views.xml',
+        'views/report_manager.xml',
+        'views/grades_evaluation_view.xml',
+        'views/grades_manager_menus.xml',
+        'views/curso_report_pdf.xml',
+    ],
+    'license': 'AGPL-3',
+    'application': True,
+    'installable': True,
+}

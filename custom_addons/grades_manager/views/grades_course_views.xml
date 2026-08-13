@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Vista de Lista -->
+    <record id="grades_course_list_view" model="ir.ui.view">
+        <field name="name">grades.course.list</field>
+        <field name="model">grades.course</field>
+        <field name="arch" type="xml">
+            <list string="Course">
+                <field name="nombre"/>
+                <field name="student_qty"/>
+                <field name="description"/>
+                <field name="is_active"/>
+                <field name="course_start"/>
+                <field name="course_end"/>
+                <field name="last_evaluation_date"/>
+                <field name="course_shift"/>
+                <field name="teacher_id"/>
+                <field name="evalaution_ids"/>
+                <field name="student_ids"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 2. Vista de Formulario -->
+    <record id="grades_course_form_view" model="ir.ui.view">
+        <field name="name">grades.course.form</field>
+        <field name="model">grades.course</field>
+        <field name="arch" type="xml">
+            <form string="Course">
+                <sheet>
+                    <group>
+                        <!-- Columna Izquierda -->
+                        <group>
+                            <field name="nombre"/>
+                            <field name="description"/>
+                            <field name="course_start"/>
+                            <field name="course_end"/>
+                            <field name="teacher_id"/>
+                            <field name="evalaution_ids"/>
+                            <field name="student_ids"/>
+                        </group>
+
+                        <!-- Columna Derecha -->
+                        <group>
+                            <field name="course_image"/>
+                            <field name="student_qty"/>
+                            <field name="is_active"/>
+                            <field name="last_evaluation_date"/>
+                            <field name="course_shift"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- 3. Acción de Ventana -->
+    <record id="grades_course_action" model="ir.actions.act_window">
+        <field name="name">Course</field>
+        <field name="res_model">grades.course</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,69 @@
+<odoo>
+    <!-- Acción del Reporte -->
+    <record id="action_report_curs" model="ir.actions.report">
+        <field name="name">Cursos</field>
+        <field name="model">grades.course</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">grades_manager.curs_file_report</field>
+        <field name="report_file">grades_manager.curs_file_report</field>
+        <field name="binding_model_id" ref="model_grades_course"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Plantilla QWeb del Reporte -->
+<odoo>
+    <template id="curs_file_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="mb-4">Reporte de Curso: <span t-field="doc.nombre"/></h2>
+                        
+                        <!-- Información General -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <p><strong>Cantidad de Estudiantes:</strong> <span t-field="doc.student_qty"/></p>
+                                <p><strong>Promedio de Calificaciones:</strong> <span t-field="doc.grades_averge"/></p>
+                                <p><strong>Turno:</strong> <span t-field="doc.course_shift"/></p>
+                                <p><strong>Activo:</strong> <span t-field="doc.is_active"/></p>
+                            </div>
+                            <div class="col-6">
+                                <p><strong>Inicio del Curso:</strong> <span t-field="doc.course_start"/></p>
+                                <p><strong>Fin del Curso:</strong> <span t-field="doc.course_end"/></p>
+                                <p><strong>Última Evaluación:</strong> <span t-field="doc.last_evaluation_date"/></p>
+                                <p><strong>Profesor:</strong> <span t-field="doc.teacher_id.name"/></p>
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-4" t-if="doc.description">
+                            <h5>Descripción:</h5>
+                            <p t-field="doc.description"/>
+                        </div>
+
+                        <!-- Tabla de Estudiantes -->
+                        <h5 class="mt-4">Estudiantes Inscritos</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Estudiante</th>
+                                    <th>Correo electrónico</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.student_ids" t-as="student">
+                                    <tr>
+                                        <td><span t-field="student.name"/></td>
+                                        <td><span t-field="student.email"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+</odoo>

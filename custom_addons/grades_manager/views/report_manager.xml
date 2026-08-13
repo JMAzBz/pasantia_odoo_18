@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="manager_reportes_list" model="ir.ui.view">
+        <field name="name">manager.report.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="phone"/>
+                <field name="email"/>                
+            </list>
+        </field>
+    </record>
+
+    <record id="action_manager_reporte" model="ir.actions.act_window">
+        <field name="name">Reportes de Cursos</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="manager_reportes_list"/>
+    </record>
+
+    <record id="manager_reportes_list" model="ir.ui.view">
+        <field name="name">manager.report.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="phone"/>
+                <field name="email"/>                
+            </list>
+        </field>
+    </record>
+
+    <record id="action_manager_reporte" model="ir.actions.act_window">
+        <field name="name">Reportes de Cursos</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="manager_reportes_list"/>
+        <!-- Filtro automático para mostrar solo estudiantes -->
+        <field name="domain">[('is_student', '=', True)]</field>
+    </record>
+</odoo>

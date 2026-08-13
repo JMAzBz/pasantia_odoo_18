@@ -1,0 +1,11 @@
+<odoo>
+    <!-- Menús -->
+    <menuitem id="grades_manager_menu" name="Grades Manager"/>
+    <menuitem id="grades_course_group_menu" sequence="1" parent="grades_manager_menu" name="Course"/>
+    <menuitem id="teacher_menu" parent="grades_manager_menu" sequence="2" name="Teacher" action="teachers_action"/>
+    <menuitem id="student_menu" parent="grades_manager_menu" name="Student" action="student_action"/>
+    <menuitem id="menu_manager_reporte" name="Reportes de Cursos" parent="grades_manager_menu" action="action_manager_reporte" sequence="20"/>
+    <menuitem id="evalaution_menu" name="Evaluation" parent="grades_course_group_menu" action="grades_evaluation_action" sequence="20"/>
+    <menuitem id="grades_course_menu" parent="grades_course_group_menu" name="Course" action="grades_course_action"/>
+    
+</odoo>
