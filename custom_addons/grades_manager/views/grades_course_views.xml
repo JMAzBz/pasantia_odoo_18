@@ -14,9 +14,9 @@
                 <field name="course_end"/>
                 <field name="last_evaluation_date"/>
                 <field name="course_shift"/>
-                <field name="teacher_id"/>
+                <field name="teacher_id" domain="[('is_teacher','=','True')]"/>
                 <field name="evalaution_ids"/>
-                <field name="student_ids"/>
+                <field name="student_ids" domain="[('is_student','=','True')]"/>
             </list>
         </field>
     </record>
