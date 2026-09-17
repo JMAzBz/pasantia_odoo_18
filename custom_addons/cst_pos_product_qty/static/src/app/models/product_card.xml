@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos.ProductCard" t-inherit="point_of_sale.ProductCard" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('product-content')]" position="before">
+            <t t-if="pos.config.show_product_qty">
+                <div class="ribbon ps-1"
+                     t-att-class="{'text-danger': availableQty &lt;= 0, 'text-success': availableQty &gt; 0}"
+                     t-attf-style="#{availableQty &lt;= 0 ? 'font-weight: 700 !important;' : ''}">
+                    <t t-if="availableQty &gt;= 0">
+                        <t t-esc="availableQty"/>
+                    </t>
+                    <t t-else="">
+                        Out
+                    </t>
+                </div>
+            </t>
+        </xpath>
+    </t>
+</templates>

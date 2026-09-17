@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="appointments_list" name="Appointments List">
+        <t t-call="website.layout">
+            <style>
+                .lux-appointment-card {
+                    border: none;
+                    border-radius: 20px;
+                    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+                    background: rgba(255, 255, 255, 0.95);
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+                    border: 1px solid rgba(0,0,0,0.05);
+                }
+                .lux-appointment-card:hover {
+                    transform: translateY(-12px);
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                }
+                .lux-btn-primary {
+                    background-color: var(--primary);
+                    border: none;
+                    border-radius: 12px;
+                    padding: 12px 30px;
+                    font-weight: 700;
+                    color: white;
+                    transition: all 0.3s;
+                }
+                .lux-btn-primary:hover {
+                    background-color: var(--primary-dark, #000);
+                    opacity: 0.9;
+                    color: white;
+                }
+                .lux-gradient-text {
+                    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+            </style>
+            <div id="wrap" class="oe_structure oe_empty pb-5">
+                <section class="pt64 pb64">
+                    <div class="container text-center">
+                            <div class="mb-4">
+                                <t t-set="first_type" t-value="appointment_types[:1]"/>
+                                <t t-if="first_type and first_type.image_1920">
+                                    <img t-attf-src="/web/image/agendame.type/#{first_type[0].id}/image_1920" class="rounded-circle shadow-lg" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid white;"/>
+                                </t>
+                                <t t-else="">
+                                    <img src="/agendame/static/description/icon.png" class="rounded-circle shadow-lg" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid white;"/>
+                                </t>
+                            </div>
+                            <h1 class="display-3 fw-bold mb-3 lux-gradient-text">
+                                Agendar Cita
+                            </h1>
+                        <p class="lead text-muted mb-5">Selecciona el tipo de reunión que mejor se adapte a tus necesidades.</p>
+                        
+                        <div class="row g-4 mt-4">
+                            <t t-foreach="appointment_types" t-as="app_type">
+                                <div class="col-lg-4">
+                                    <div class="card lux-appointment-card h-100 p-4">
+                                            <div class="card-body d-flex flex-column text-center">
+                                                <div class="mb-4">
+                                                    <t t-if="app_type.image_1920">
+                                                        <img t-attf-src="/web/image/agendame.type/#{app_type.id}/image_1920" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-light" style="width: 80px; height: 80px; background-color: #f8f9fa;">
+                                                            <i class="fa fa-calendar-check-o fa-2x" t-att-style="'color: %s' % (app_type.color_primary or '#714B67')"/>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                <h3 class="fw-bold mb-2" t-esc="app_type.name"/>
+                                            <div class="mb-4">
+                                                <span class="badge bg-light text-primary p-2 px-3 rounded-pill fw-bold">
+                                                    <i class="fa fa-clock-o me-2"/>
+                                                    <t t-set="duration_hours" t-value="int(app_type.appointment_duration)"/>
+                                                    <t t-set="duration_mins" t-value="int((app_type.appointment_duration - duration_hours) * 60)"/>
+                                                    <t t-if="duration_hours &gt; 0">
+                                                        <t t-esc="duration_hours"/> <t t-if="duration_hours == 1">hora</t><t t-else="">horas</t>
+                                                    </t>
+                                                    <t t-if="duration_mins &gt; 0">
+                                                        <t t-if="duration_hours &gt; 0"> </t>
+                                                        <t t-esc="duration_mins"/> min
+                                                    </t>
+                                                </span>
+                                            </div>
+                                            <div class="mt-auto">
+                                                <a t-attf-href="/agendame/#{app_type.id}" class="btn btn-lg d-block text-decoration-none fw-bold text-white" t-att-style="'background-color: %s; border-radius: 12px; padding: 12px 30px;' % (app_type.color_primary or '#714B67')">
+                                                    Agendar Ahora
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="appointment_details" name="Appointment Details">
+        <t t-call="website.layout">
+            <style>
+                .staff-card {
+                    border: 2px solid #edf2f7;
+                    border-radius: 16px;
+                    padding: 20px 15px;
+                    text-align: center;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    background: white;
+                }
+                .staff-card:hover {
+                    border-color: var(--primary);
+                    transform: translateY(-4px);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+                }
+                .staff-card.active {
+                    border-color: var(--primary);
+                    background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%);
+                    color: white;
+                    box-shadow: 0 10px 30px -5px var(--primary);
+                }
+                .staff-card .staff-avatar {
+                    width: 70px;
+                    height: 70px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 3px solid #edf2f7;
+                    margin-bottom: 10px;
+                    transition: all 0.3s;
+                }
+                .staff-card.active .staff-avatar {
+                    border-color: rgba(255,255,255,0.5);
+                }
+                .staff-card .staff-name {
+                    font-weight: 700;
+                    font-size: 0.95rem;
+                    margin: 0;
+                }
+                .slot-btn {
+                    border: 1px solid var(--border-color, #e2e8f0);
+                    border-radius: 12px;
+                    padding: 15px;
+                    text-align: center;
+                    cursor: pointer;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    background: white;
+                    font-weight: 600;
+                }
+                .slot-btn:hover {
+                    background: var(--light, #f7fafc);
+                    border-color: var(--primary);
+                    color: var(--primary);
+                }
+                .slot-btn.active {
+                    background: var(--primary);
+                    color: white;
+                    border-color: var(--primary);
+                    box-shadow: 0 10px 20px -5px var(--primary);
+                }
+                .date-pill {
+                    border: 1px solid #edf2f7;
+                    border-radius: 12px;
+                    padding: 8px 12px;
+                    min-width: 70px;
+                    text-align: center;
+                    cursor: pointer;
+                    background: white;
+                    transition: all 0.3s;
+                    flex-shrink: 0;
+                    line-height: 1.2;
+                }
+                .date-pill.active {
+                    background: var(--primary);
+                    color: white;
+                    border-color: var(--primary);
+                    transform: scale(1.05);
+                }
+                .date-pill .day-name { font-size: 0.7rem; opacity: 0.8; text-transform: uppercase; }
+                .date-pill .day-num { font-size: 1.1rem; font-weight: 800; margin: 2px 0; }
+                .date-pill .month-name { font-size: 0.65rem; font-weight: 700; opacity: 0.9; }
+                .lux-form-control {
+                    border-radius: 12px;
+                    border: 2px solid #edf2f7;
+                    padding: 12px 20px;
+                    transition: all 0.3s;
+                }
+                .lux-form-control:focus {
+                    border-color: var(--primary);
+                    box-shadow: none;
+                }
+                .horizontal-scroll {
+                    display: flex;
+                    overflow-x: auto;
+                    gap: 15px;
+                    padding: 10px 5px 20px 5px;
+                    scrollbar-width: thin;
+                }
+                .horizontal-scroll::-webkit-scrollbar { height: 6px; }
+                .horizontal-scroll::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
+                .slots-loading {
+                    text-align: center;
+                    padding: 40px;
+                    color: #a0aec0;
+                }
+                .slots-loading .fa-spinner { font-size: 2rem; }
+                .fade-in {
+                    animation: fadeIn 0.3s ease-in;
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            </style>
+            <div id="wrap" class="oe_structure oe_empty bg-light pb-5">
+                <div class="container pt64" t-att-style="'--primary: %s; --secondary: %s;' % (appointment_type.color_primary or '#714B67', appointment_type.color_secondary or '#212529')">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-11">
+                            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+                                <div class="row g-0">
+                                    <div class="col-md-4 text-white p-5 d-flex flex-column" t-att-style="'background-color: %s; position: relative;' % (appointment_type.color_secondary or '#212529')">
+                                        <a href="/agendame" class="text-white-50 mb-5 d-inline-block text-decoration-none h5" style="z-index: 2;"><i class="fa fa-chevron-left me-2"/> Volver</a>
+                                        
+                                        <div class="mb-5 text-center" style="z-index: 2;">
+                                            <t t-if="appointment_type.image_1920">
+                                                <img t-attf-src="/web/image/agendame.type/#{appointment_type.id}/image_1920" class="rounded-circle shadow-lg mb-4" style="width: 150px; height: 150px; object-fit: cover; border: 4px solid white;"/>
+                                            </t>
+                                            <!-- Selected professional name shown dynamically -->
+                                            <p class="h5 opacity-75" id="sidebar_staff_name" style="display: none;">Con <span id="sidebar_staff_name_text"></span></p>
+                                        </div>
+                                        <h4 class="fw-bold mb-2" t-att-style="'color: %s' % (appointment_type.color_primary or '#714B67')">Reserva</h4>
+                                        <h1 class="fw-bold mb-4" t-esc="appointment_type.name"/>
+                                        <div class="h5 mb-4 opacity-75">
+                                            <i class="fa fa-clock-o me-2" t-att-style="'color: %s' % (appointment_type.color_primary or '#714B67')"/>
+                                            <t t-set="duration_hours" t-value="int(appointment_type.appointment_duration)"/>
+                                            <t t-set="duration_mins" t-value="int((appointment_type.appointment_duration - duration_hours) * 60)"/>
+                                            <t t-if="duration_hours &gt; 0">
+                                                <t t-esc="duration_hours"/> <t t-if="duration_hours == 1">hora</t><t t-else="">horas</t>
+                                            </t>
+                                            <t t-if="duration_mins &gt; 0">
+                                                <t t-if="duration_hours &gt; 0"> </t>
+                                                <t t-esc="duration_mins"/> min
+                                            </t>
+                                        </div>
+                                        <div class="p-3 bg-white bg-opacity-10 rounded-3 border border-white border-opacity-10">
+                                            <p class="mb-0 small"><i class="fa fa-globe me-2"/> Zona horaria: <t t-esc="appointment_type.appointment_tz"/></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 p-5">
+                                        <t t-if="request.params.get('error')">
+                                            <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4" role="alert">
+                                                <i class="fa fa-exclamation-circle me-2"/>
+                                                <t t-if="request.params.get('error') == 'past_slot'">
+                                                    El horario seleccionado ya ha transcurrido. Por favor selecciona un horario disponible actual o futuro.
+                                                </t>
+                                                <t t-elif="request.params.get('error') == 'already_booked'">
+                                                    Este horario ya no está disponible. Por favor elige otro horario.
+                                                </t>
+                                                <t t-else="">
+                                                    Ocurrió un problema con la reserva. Por favor selecciona un horario nuevamente.
+                                                </t>
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        </t>
+                                        <form action="/agendame/submit" method="post" id="appointment_form">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <input type="hidden" name="agendame_type_id" t-att-value="appointment_type.id"/>
+                                            <input type="hidden" name="staff_user_id" id="selected_staff_user_id"/>
+                                            <input type="hidden" name="date" id="selected_date"/>
+
+                                            <!-- Step 1: Select Professional -->
+                                            <div id="step_staff">
+                                                <h3 class="fw-bold mb-4">1. Selecciona tu Profesional</h3>
+                                                <div class="row g-3">
+                                                    <t t-foreach="staff_users" t-as="staff">
+                                                        <div class="col-6 col-sm-4 col-md-4">
+                                                            <div class="staff-card" t-att-data-staff-id="staff['id']" t-att-data-staff-name="staff['name']">
+                                                                <img t-att-src="staff['image_url']" class="staff-avatar" alt="Avatar"/>
+                                                                <p class="staff-name" t-esc="staff['name']"/>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </div>
+
+                                            <!-- Step 2: Date and time (loaded dynamically) -->
+                                            <div id="step_datetime" style="display: none;" class="mt-5 pt-4 border-top">
+                                                <h3 class="fw-bold mb-4">2. Selecciona Fecha</h3>
+                                                <div id="dates_container" class="horizontal-scroll mb-5"></div>
+
+                                                <h3 class="fw-bold mb-4 mt-4 h4">3. Horarios disponibles</h3>
+                                                <div id="slots_container"></div>
+                                                <div id="slots_loading" class="slots-loading" style="display: none;">
+                                                    <i class="fa fa-spinner fa-spin"></i>
+                                                    <p class="mt-2">Cargando horarios...</p>
+                                                </div>
+                                                <div id="no_slots_msg" style="display: none;">
+                                                    <div class="alert alert-warning py-4 px-5 rounded-4 border-0">
+                                                        <h4 class="fw-bold"><i class="fa fa-exclamation-circle me-2"/>No hay horarios disponibles</h4>
+                                                        No se encontraron horarios para los próximos días con este profesional.
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Step 3: Contact info -->
+                                            <div id="contact_info" class="mt-5 pt-4 border-top" style="display: none;">
+                                                <h3 class="fw-bold mb-4">4. Tus Datos</h3>
+                                                <div class="mb-4">
+                                                    <label class="form-label h6 fw-bold">Nombre Completo</label>
+                                                    <input type="text" class="form-control lux-form-control shadow-none" name="name" required="1" placeholder="Ej: Juan Pérez"/>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-4">
+                                                        <label class="form-label h6 fw-bold">Email</label>
+                                                        <input type="email" class="form-control lux-form-control shadow-none" name="email" required="1" placeholder="ejemplo@correo.com"/>
+                                                    </div>
+                                                    <div class="col-md-6 mb-4">
+                                                        <label class="form-label h6 fw-bold">País</label>
+                                                        <select class="form-select lux-form-control shadow-none" name="country_id" id="country_selector" required="1">
+                                                            <t t-foreach="countries" t-as="country">
+                                                                <option t-att-value="country.id" t-att-data-code="country.phone_code" t-att-selected="country.code == 'CL'">
+                                                                    <t t-esc="country.name"/> (+<t t-esc="country.phone_code"/>)
+                                                                </option>
+                                                            </t>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-4">
+                                                        <label class="form-label h6 fw-bold">Teléfono móvil</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text lux-form-control border-end-0 bg-light" id="phone_prefix">+56</span>
+                                                            <input type="tel" class="form-control lux-form-control shadow-none" id="phone_input" name="phone" required="1" placeholder="9 1234 5678"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="submit" id="submit_button" class="btn lux-btn-primary btn-lg w-100 shadow-lg py-3 h4 mt-3">
+                                                    Confirmar Cita <i class="fa fa-arrow-right ms-2"/>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                (function() {
+                    const appointmentTypeId = <t t-esc="appointment_type.id"/>;
+                    const daysEs = {
+                        'Mon': 'Lun', 'Tue': 'Mar', 'Wed': 'Mié',
+                        'Thu': 'Jue', 'Fri': 'Vie', 'Sat': 'Sáb', 'Sun': 'Dom'
+                    };
+                    const monthsEs = {
+                        'January': 'Enero', 'February': 'Febrero', 'March': 'Marzo',
+                        'April': 'Abril', 'May': 'Mayo', 'June': 'Junio',
+                        'July': 'Julio', 'August': 'Agosto', 'September': 'Septiembre',
+                        'October': 'Octubre', 'November': 'Noviembre', 'December': 'Diciembre'
+                    };
+
+                    const countrySelector = document.getElementById('country_selector');
+                    const phonePrefix = document.getElementById('phone_prefix');
+                    const form = document.getElementById('appointment_form');
+                    const submitBtn = document.getElementById('submit_button');
+
+                    // Country change updates phone prefix
+                    countrySelector.addEventListener('change', function() {
+                        const option = this.options[this.selectedIndex];
+                        phonePrefix.textContent = '+' + option.dataset.code;
+                    });
+
+                    // Prevent double submit
+                    form.addEventListener('submit', function(e) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '\u003ci class="fa fa-spinner fa-spin me-2"\u003e\u003c/i\u003eProcesando...';
+                    });
+
+                    // --- Step 1: Staff selection ---
+                    const staffCards = document.querySelectorAll('.staff-card');
+                    staffCards.forEach(card => {
+                        card.addEventListener('click', function() {
+                            // Highlight selected card
+                            document.querySelectorAll('.staff-card').forEach(c => c.classList.remove('active'));
+                            this.classList.add('active');
+
+                            const staffId = this.dataset.staffId;
+                            const staffName = this.dataset.staffName;
+                            document.getElementById('selected_staff_user_id').value = staffId;
+
+                            // Update sidebar
+                            document.getElementById('sidebar_staff_name_text').textContent = staffName;
+                            document.getElementById('sidebar_staff_name').style.display = 'block';
+
+                            // Reset subsequent steps
+                            document.getElementById('contact_info').style.display = 'none';
+                            document.getElementById('selected_date').value = '';
+
+                            // Load slots for this staff
+                            loadStaffSlots(staffId);
+                        });
+                    });
+
+                    // Auto-select if there is only 1 professional card
+                    if (staffCards.length === 1) {
+                        staffCards[0].click();
+                    }
+
+                    function loadStaffSlots(staffId) {
+                        const stepDatetime = document.getElementById('step_datetime');
+                        const datesContainer = document.getElementById('dates_container');
+                        const slotsContainer = document.getElementById('slots_container');
+                        const loadingEl = document.getElementById('slots_loading');
+                        const noSlotsMsg = document.getElementById('no_slots_msg');
+
+                        stepDatetime.style.display = 'block';
+                        datesContainer.innerHTML = '';
+                        slotsContainer.innerHTML = '';
+                        loadingEl.style.display = 'block';
+                        noSlotsMsg.style.display = 'none';
+
+                        fetch('/agendame/' + appointmentTypeId + '/slots?staff_user_id=' + staffId)
+                            .then(r => r.json())
+                            .then(data => {
+                                loadingEl.style.display = 'none';
+
+                                if (!data.dates || data.dates.length === 0) {
+                                    noSlotsMsg.style.display = 'block';
+                                    return;
+                                }
+
+                                // Render date pills
+                                data.dates.forEach((dateObj, idx) => {
+                                    const pill = document.createElement('div');
+                                    pill.className = 'date-pill' + (idx === 0 ? ' active' : '');
+                                    pill.dataset.dateKey = dateObj.date;
+                                    pill.innerHTML =
+                                        '<div class="day-name">' + (daysEs[dateObj.weekday] || dateObj.weekday) + '</div>' +
+                                        '<div class="day-num">' + dateObj.day + '</div>' +
+                                        '<div class="month-name">' + (monthsEs[dateObj.month] || dateObj.month) + '</div>';
+                                    pill.addEventListener('click', function() {
+                                        document.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
+                                        this.classList.add('active');
+                                        showSlotsForDate(this.dataset.dateKey);
+                                        document.getElementById('contact_info').style.display = 'none';
+                                        document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+                                        document.getElementById('selected_date').value = '';
+                                    });
+                                    datesContainer.appendChild(pill);
+                                });
+
+                                // Store data globally for slot rendering
+                                window._agendameSlotData = {};
+                                data.dates.forEach(d => {
+                                    window._agendameSlotData[d.date] = d.slots;
+                                });
+
+                                // Show first date's slots
+                                showSlotsForDate(data.dates[0].date);
+
+                                stepDatetime.classList.add('fade-in');
+                            })
+                            .catch(() => {
+                                loadingEl.style.display = 'none';
+                                noSlotsMsg.style.display = 'block';
+                            });
+                    }
+
+                    function showSlotsForDate(dateKey) {
+                        const slotsContainer = document.getElementById('slots_container');
+                        slotsContainer.innerHTML = '';
+
+                        const slots = window._agendameSlotData[dateKey] || [];
+                        if (slots.length === 0) {
+                            slotsContainer.innerHTML = '<p class="text-muted">No hay horarios disponibles para esta fecha.</p>';
+                            return;
+                        }
+
+                        const row = document.createElement('div');
+                        row.className = 'row g-3 fade-in';
+
+                        slots.forEach(slot => {
+                            const col = document.createElement('div');
+                            col.className = 'col-6 col-sm-4 col-md-3';
+                            const btn = document.createElement('div');
+                            btn.className = 'slot-btn';
+                            btn.dataset.date = slot.datetime;
+                            btn.textContent = slot.time;
+                            btn.addEventListener('click', function() {
+                                document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+                                this.classList.add('active');
+                                document.getElementById('selected_date').value = this.dataset.date;
+                                document.getElementById('contact_info').style.display = 'block';
+                                window.scrollTo({
+                                    top: document.getElementById('contact_info').offsetTop,
+                                    behavior: 'smooth'
+                                });
+                            });
+                            col.appendChild(btn);
+                            row.appendChild(col);
+                        });
+
+                        slotsContainer.appendChild(row);
+                    }
+                })();
+            </script>
+        </t>
+    </template>
+
+    <template id="appointment_thanks" name="Thank You">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty bg-light py-5">
+                <div class="container py-5 mt-5">
+                    <div class="row justify-content-center text-center">
+                        <div class="col-lg-6">
+                            <div class="card border-0 shadow-lg rounded-4 p-5 scale-in">
+                                <div class="mb-4">
+                                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                        <i class="fa fa-check-circle fa-5x text-success"/>
+                                    </div>
+                                </div>
+                                <h1 class="fw-bold mb-3 h2">¡Cita Confirmada!</h1>
+                                <p class="lead mb-5 text-muted">Hemos agendado tu reunión exitosamente.</p>
+                                
+                                <div class="bg-light p-4 rounded-4 mb-5 text-start border shadow-sm">
+                                    <h5 class="fw-bold mb-3"><i class="fa fa-info-circle me-2 text-primary"/> Detalles</h5>
+                                    <p class="mb-2"><strong>Tipo:</strong> <t t-esc="event.name"/></p>
+                                    <p class="mb-0"><strong>Fecha:</strong> <span t-field="event.start" t-options='{"widget": "datetime"}'/></p>
+                                </div>
+                                
+                                 <div class="row g-3">
+                                    <div class="col-sm-12">
+                                        <a href="/" class="btn btn-primary btn-lg w-100 rounded-3 lux-btn-primary fw-bold">Volver al Inicio</a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <style>
+                @keyframes scaleIn {
+                    from { transform: scale(0.9); opacity: 0; }
+                    to { transform: scale(1); opacity: 1; }
+                }
+                .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+            </style>
+        </t>
+    </template>
+
+</odoo>

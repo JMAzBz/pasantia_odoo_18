@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Odoo Debug (Windows)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/odoo-bin",
+            "args": [
+                "-c",
+                "${workspaceFolder}/odoo.conf"
+            ],
+            "python": "${workspaceFolder}/venv/Scripts/python.exe",
+            "console": "integratedTerminal"
+        }
+    ]
+}
