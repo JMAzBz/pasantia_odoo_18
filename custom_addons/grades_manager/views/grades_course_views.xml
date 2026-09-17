@@ -27,17 +27,20 @@
         <field name="model">grades.course</field>
         <field name="arch" type="xml">
             <form string="Course">
+                <header>
+                    <field name="state" widget="statusbar" options="{'clickable': 1}"/>
+                </header>
                 <sheet>
                     <group>
                         <!-- Columna Izquierda -->
                         <group>
-                            <field name="nombre"/>
+                            <field name="nombre" required="1"/>
                             <field name="description"/>
-                            <field name="course_start"/>
-                            <field name="course_end"/>
-                            <field name="teacher_id"/>
-                            <field name="evalaution_ids"/>
-                            <field name="student_ids"/>
+                            <field name="course_start" required="1"/>
+                            <field name="course_end" required="1"/>
+                            <field name="teacher_id" domain="[('is_teacher','=',True)]" required="1" readonly="state != 'register'"
+                            context="{'list_view_ref':'grades_manager.student_list_view',
+                                      'form_view_ref':'grades_manager.student_form_view'}"/>
                         </group>
 
                         <!-- Columna Derecha -->
@@ -45,9 +48,19 @@
                             <field name="course_image"/>
                             <field name="student_qty"/>
                             <field name="is_active"/>
-                            <field name="last_evaluation_date"/>
+                            <field name="last_evaluation_date" readonly="1"/>
                             <field name="course_shift"/>
                         </group>
+                        <notebook>
+                            <page string="Evaluation" name="evaluation">
+                                <field name="evalaution_ids" readonly="state != 'register'" />
+                            </page>
+                            <page string="Student" name="student">
+                                <field name="student_ids" domain="[('is_student','=',True)]" readonly="state != 'register'" 
+                                    context="{'list_view_ref':'grades_manager.student_list_view',
+                                      'form_view_ref':'grades_manager.student_form_view'}"/>
+                            </page>
+                        </notebook>
                     </group>
                 </sheet>
             </form>
